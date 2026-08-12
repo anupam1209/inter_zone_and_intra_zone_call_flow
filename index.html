@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  html, body { margin: 0; padding: 0; background: #FAF9F8; }
+  a { color: #4C6E9B; text-decoration: none; }
+  a:hover { color: #3D7C64; }
+  ::selection { background: rgba(90,90,168,0.14); }
+</style>
+</helmet>
+<div style="width:100%;box-sizing:border-box;padding:72px 40px 96px;background:#FAF9F8;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text',system-ui,sans-serif;color:#1D1D1F;-webkit-font-smoothing:antialiased">
+
+  <div style="width:1648px;margin:0 auto 56px;box-sizing:border-box;padding:0 44px">
+    <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;font-weight:500;letter-spacing:1.6px;color:#8E8E93">C-DOT IMS · SOLUTION DOC v17.0 · JUNE&#8217;26</div>
+    <h1 style="margin:20px 0 0;font-size:46px;font-weight:600;letter-spacing:-1.4px;line-height:1.06;max-width:900px;text-wrap:balance">Intra-Zone vs Inter-Zone Call Flow</h1>
+    <p style="margin:18px 0 0;max-width:620px;font-size:16px;line-height:1.55;color:#6E6E73;text-wrap:pretty">Which nodes wake up, which interfaces carry each message, and exactly where the two flows diverge.</p>
+  </div>
+
+  <sc-for list="{{ scenarios }}" as="s" hint-placeholder-count="2">
+    <div style="width:1648px;margin:0 auto 40px;background:#FFFFFF;border:1px solid #ECECEA;border-radius:18px;box-shadow:0 1px 1px rgba(0,0,0,0.02),0 20px 40px -32px rgba(0,0,0,0.18)">
+      <div style="display:flex;align-items:baseline;gap:18px;padding:38px 44px 4px;flex-wrap:wrap">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10.5px;font-weight:500;letter-spacing:1.6px;color:#A1A1A6">{{ s.kick }}</span>
+        <span style="font-size:22px;font-weight:600;letter-spacing:-0.5px">{{ s.title }}</span>
+      </div>
+
+      <div style="padding:0 44px 8px">
+        <div style="position:relative;width:1560px;padding:34px 0 0">
+
+          <div style="position:relative;height:46px">
+            <sc-for list="{{ s.groups }}" as="g" hint-placeholder-count="1">
+              <div style="position:absolute;top:16px;left:{{ g.left }}px;width:{{ g.width }}px;height:1px;background:#E4E4E1"></div>
+              <div style="position:absolute;top:12px;left:{{ g.left }}px;width:1px;height:9px;background:#E4E4E1"></div>
+              <div style="position:absolute;top:12px;left:{{ g.right }}px;width:1px;height:9px;background:#E4E4E1"></div>
+              <div style="position:absolute;top:6px;left:{{ g.mid }}px;transform:translateX(-50%);display:flex;align-items:baseline;gap:9px;padding:0 14px;background:#FFFFFF;white-space:nowrap">
+                <span style="width:5px;height:5px;border-radius:50%;background:{{ g.color }};transform:translateY(-2px)"></span>
+                <span style="font-size:12px;font-weight:600;letter-spacing:0.2px">{{ g.label }}</span>
+                <span style="font-size:12px;color:#8E8E93">{{ g.sub }}</span>
+              </div>
+            </sc-for>
+            <sc-for list="{{ s.seams }}" as="k" hint-placeholder-count="0">
+              <div style="position:absolute;top:0;left:{{ k.x }}px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div style="width:7px;height:7px;background:#A46A3C;transform:rotate(45deg)"></div>
+                <span style="padding:2px 10px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:9.5px;letter-spacing:0.4px;color:#A46A3C;white-space:nowrap">{{ k.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="position:sticky;top:0;z-index:5;height:64px;padding-top:6px;box-sizing:border-box;background:#FFFFFF;box-shadow:0 1px 0 #F2F2F0,0 10px 16px -14px rgba(0,0,0,0.16)">
+            <sc-for list="{{ s.nodes }}" as="n" hint-placeholder-count="11">
+              <div onMouseEnter="{{ n.onEnter }}" onMouseLeave="{{ leaveLane }}" style="position:absolute;top:7px;left:{{ n.left }}px;width:{{ n.width }}px;box-sizing:border-box;padding:8px 6px 10px;border-radius:9px;text-align:center;background:{{ n.bg }};transition:background .18s ease,opacity .18s ease;opacity:{{ n.op }};cursor:default">
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px">
+                  <span style="width:5.5px;height:5.5px;border-radius:50%;background:{{ n.color }};flex:none"></span>
+                  <span style="font-size:13.5px;font-weight:600;letter-spacing:-0.15px;white-space:nowrap">{{ n.name }}</span>
+                </div>
+                <div style="margin-top:4px;font-size:11px;letter-spacing:0.05px;color:#8E8E93;white-space:nowrap">{{ n.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="position:relative">
+            <sc-for list="{{ s.lifelines }}" as="l" hint-placeholder-count="11">
+              <div style="position:absolute;top:0;left:{{ l.x }}px;width:1px;height:100%;background:{{ l.color }};transition:background .18s ease"></div>
+            </sc-for>
+
+            <sc-for list="{{ s.phases }}" as="p" hint-placeholder-count="4">
+              <div style="position:relative;padding:0 0 6px;--acc:{{ p.accent }}">
+                <div style="position:relative;display:flex;align-items:center;gap:12px;height:52px;padding:0 44px">
+                  <span style="width:16px;height:2px;border-radius:1px;background:var(--acc);flex:none"></span>
+                  <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10.5px;font-weight:500;letter-spacing:1.5px;color:#6E6E73;white-space:nowrap">{{ p.label }}</span>
+                  <span style="flex:1;height:1px;background:#F0F0EE"></span>
+                </div>
+
+                <sc-for list="{{ p.rows }}" as="m" hint-placeholder-count="4">
+                  <div onMouseEnter="{{ m.onEnter }}" onMouseLeave="{{ leaveRow }}" onClick="{{ m.onClick }}" style="position:relative;height:58px;opacity:{{ m.op }};transition:opacity .18s ease;cursor:default">
+                    <div style="position:absolute;top:2px;left:24px;right:24px;height:54px;border-radius:10px;background:{{ m.plate }};transition:background .18s ease"></div>
+                    <div style="position:absolute;top:8px;left:{{ m.labelLeft }}px;width:{{ m.labelWidth }}px;display:flex;align-items:baseline;justify-content:center;gap:8px;white-space:nowrap">
+                      <span style="font-size:13px;font-weight:590;letter-spacing:-0.1px;color:#1D1D1F">{{ m.name }}</span>
+                      <span style="font-size:12.5px;color:#86868B;letter-spacing:-0.05px">{{ m.desc }}</span>
+                      <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10.5px;letter-spacing:0.3px;color:var(--acc)">{{ m.iface }}</span>
+                    </div>
+                    <sc-if value="{{ m.isSelf }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;top:34px;left:{{ m.left }}px;width:38px;height:12px;border:1px solid var(--acc);border-left:none;border-radius:0 6px 6px 0;opacity:0.55"></div>
+                      <div style="position:absolute;top:41px;left:{{ m.headX }}px;width:0;height:0;border-right:6px solid var(--acc);border-top:3.5px solid transparent;border-bottom:3.5px solid transparent;opacity:0.8"></div>
+                    </sc-if>
+                    <sc-if value="{{ m.isFlow }}" hint-placeholder-val="{{ true }}">
+                      <div style="position:absolute;top:40px;left:{{ m.left }}px;width:{{ m.width }}px;height:0;border-top:1.2px {{ m.stroke }} var(--acc);opacity:{{ m.lineOp }};transition:opacity .18s ease"></div>
+                      <sc-if value="{{ m.right }}" hint-placeholder-val="{{ true }}">
+                        <div style="position:absolute;top:35px;left:{{ m.headX }}px;width:0;height:0;border-left:7px solid var(--acc);border-top:4px solid transparent;border-bottom:4px solid transparent;opacity:0.85"></div>
+                      </sc-if>
+                      <sc-if value="{{ m.leftward }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute;top:35px;left:{{ m.headX }}px;width:0;height:0;border-right:7px solid var(--acc);border-top:4px solid transparent;border-bottom:4px solid transparent;opacity:0.85"></div>
+                      </sc-if>
+                    </sc-if>
+                    <sc-if value="{{ m.detail }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;top:36px;right:44px;padding:3px 10px;border-radius:6px;background:#F7F7F5;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;letter-spacing:0.2px;color:#86868B;white-space:nowrap">{{ m.detail }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+
+                <sc-if value="{{ p.media }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:relative;height:64px">
+                    <div style="position:absolute;top:34px;left:{{ p.mediaLeft }}px;width:{{ p.mediaWidth }}px;height:1px;background:var(--acc);opacity:0.35"></div>
+                    <div style="position:absolute;top:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:0 18px;background:#FFFFFF;white-space:nowrap">
+                      <span style="width:5px;height:5px;border-radius:50%;background:var(--acc)"></span>
+                      <span style="font-size:12.5px;font-weight:590;color:#1D1D1F">{{ p.mediaName }}</span>
+                      <span style="font-size:12.5px;color:#86868B">{{ p.media }}</span>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:flex;gap:16px;padding:26px 44px 36px;border-top:1px solid #F2F2F0;margin-top:14px">
+        <p style="margin:0;max-width:1100px;font-size:13px;line-height:1.6;color:#6E6E73;text-wrap:pretty">{{ s.note }}</p>
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="width:1648px;margin:0 auto;box-sizing:border-box;padding:4px 44px 0">
+    <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10.5px;font-weight:500;letter-spacing:1.5px;color:#A1A1A6">LEGEND · NODE PLACEMENT</div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(320px,1fr));gap:16px 64px;margin-top:20px;max-width:1200px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#86868B;flex:none"></span>
+        <span style="font-size:13px;color:#6E6E73">UE / subscriber</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#3D7C7A;flex:none"></span>
+        <span style="font-size:13px;color:#6E6E73">Mini DC · circle-wise  (P-CSCF, IBCF, MRF, IMS-DP, Conf-Media)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#5A5AA8;flex:none"></span>
+        <span style="font-size:13px;color:#6E6E73">Main DC · zonal  (I/S-CSCF, TAS, IMSENUM, Conf-Sig, USSD-AS)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#A5811F;flex:none"></span>
+        <span style="font-size:13px;color:#6E6E73">Subscriber data · HSS / SLF via DRA + DLB</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1660},&quot;showLifelines&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const KIND = { ue: '#86868B', mini: '#3D7C7A', main: '#5A5AA8', data: '#A5811F' };
+const PHASES = {
+  orig:  { label: 'ORIGINATION',       accent: '#4C6E9B' },
+  res:   { label: 'NUMBER RESOLUTION', accent: '#6C5D9E' },
+  inter: { label: 'INTERCONNECT',      accent: '#A46A3C' },
+  term:  { label: 'TERMINATION',       accent: '#3D7C64' },
+  ans:   { label: 'ANSWER & MEDIA',    accent: '#9E5A76' }
+};
+const W = 1560, PAD = 30, CANVAS = 1500, ROWH = 58;
+
+const A = {
+  kick: 'SCENARIO A',
+  title: 'Intra-Zone call — both subscribers on the same Main DC',
+  note: 'No IBCF, no public IP, no GMSC. Only the Mini DC (P-CSCF / IMS-DP) differs per circle; I-CSCF, S-CSCF, TAS, IMSENUM are zonal and shared. Intra-circle roaming stays home-routed.',
+  mediaName: 'RTP',
+  media: 'IMS-DP (Mini DC A) ↔ IMS-DP (Mini DC B)',
+  nodes: [
+    ['UE-A', 'subscriber', 'ue'], ['P-CSCF', 'Mini DC · Ckt A', 'mini'],
+    ['S-CSCF', 'Main DC · orig', 'main'], ['TAS', 'Main DC · orig', 'main'],
+    ['IMSENUM', 'Main DC', 'main'], ['I-CSCF', 'Main DC', 'main'],
+    ['HSS / SLF', 'via DRA+DLB', 'data'], ['S-CSCF', 'Main DC · term', 'main'],
+    ['TAS', 'Main DC · term', 'main'], ['P-CSCF', 'Mini DC · Ckt B', 'mini'],
+    ['UE-B', 'subscriber', 'ue']
+  ],
+  groups: [[2, 8, 'SAME ZONE', 'shared Main DC · zonal core', '#5A5AA8']],
+  seams: [],
+  msgs: [
+    ['orig', 0, 1, 'INVITE', 'Gm'],
+    ['orig', 1, 2, 'INVITE', 'Mw'],
+    ['orig', 2, 3, 'INVITE — orig iFC hit', 'ISC'],
+    ['orig', 3, 6, 'UDR — originating subscriber data', 'Sh', 1],
+    ['orig', 6, 3, 'UDA', 'Sh', 1],
+    ['orig', 3, 2, 'INVITE — orig features applied', 'ISC'],
+    ['res', 2, 4, 'NAPTR query — dialled MSISDN', 'ENUM', 1],
+    ['res', 4, 2, 'SIP-URI — same zone, no LRN', 'ENUM', 1],
+    ['term', 2, 5, 'INVITE', 'Mw'],
+    ['term', 5, 6, 'LIR — locate serving S-CSCF', 'Cx', 1],
+    ['term', 6, 5, 'LIA — S-CSCF name', 'Cx', 1],
+    ['term', 5, 7, 'INVITE', 'Mw'],
+    ['term', 7, 8, 'INVITE — term iFC hit', 'ISC'],
+    ['term', 8, 6, 'UDR / UDA — TADS, user state, CSRN', 'Sh', 1],
+    ['term', 8, 7, 'INVITE — term features applied', 'ISC'],
+    ['term', 7, 9, 'INVITE', 'Mw'],
+    ['term', 9, 10, 'INVITE', 'Gm'],
+    ['ans', 10, 9, '183 Session Progress + SDP', 'Gm'],
+    ['ans', 9, 9, 'AAR / AAA → PCRF (bearer)', 'Rx'],
+    ['ans', 9, 1, '183 / 180 Ringing / 200 OK — same chain reversed', '', 1],
+    ['ans', 1, 1, 'AAR / AAA → PCRF (bearer)', 'Rx'],
+    ['ans', 1, 0, '183 / 180 Ringing / 200 OK', 'Gm'],
+    ['ans', 0, 10, 'PRACK · UPDATE · ACK — full signalling path', '', 1]
+  ]
+};
+
+const B = {
+  kick: 'SCENARIO B',
+  title: 'Inter-Zone call — two independent C-DOT IMS zones, joined at the IBCF',
+  note: 'IBCF is the only door between zones: Ici on public IP, topology hiding, IPv4/IPv6 interworking, and its own ACR to CDF. A TEL-URI, or an LRN that is not a 4G C-DOT subscriber, leaves via GMSC instead.',
+  mediaName: 'RTP',
+  media: 'IMS-DP (Zone A) ↔ IBCF / I-SBC ↔ IBCF / I-SBC ↔ IMS-DP (Zone B)',
+  nodes: [
+    ['UE-A', 'Zone A', 'ue'], ['P-CSCF', 'Mini DC · Zone A', 'mini'],
+    ['S-CSCF', 'Main DC · Zone A', 'main'], ['TAS', 'Main DC · Zone A', 'main'],
+    ['IMSENUM', 'all-zone data', 'main'], ['IBCF', 'Mini DC · Zone A', 'mini'],
+    ['IBCF', 'Mini DC · Zone B', 'mini'], ['I-CSCF', 'Main DC · Zone B', 'main'],
+    ['HSS', 'Zone B · via DLB', 'data'], ['S-CSCF', 'Main DC · Zone B', 'main'],
+    ['TAS', 'Main DC · Zone B', 'main'], ['P-CSCF', 'Mini DC · Zone B', 'mini'],
+    ['UE-B', 'Zone B', 'ue']
+  ],
+  groups: [[1, 5, 'ZONE A', '', '#5A5AA8'], [6, 12, 'ZONE B', '', '#3D7C7A']],
+  seams: [[5, 'interconnect · Ici']],
+  msgs: [
+    ['orig', 0, 1, 'INVITE', 'Gm'],
+    ['orig', 1, 2, 'INVITE', 'Mw'],
+    ['orig', 2, 3, 'INVITE — orig iFC hit', 'ISC'],
+    ['orig', 3, 2, 'INVITE — orig features, prepaid / VPN checked', 'ISC'],
+    ['res', 2, 4, 'NAPTR query', 'ENUM', 1],
+    ['res', 4, 2, 'SIP-URI of other zone · TEL-URI + LRN → GMSC', 'ENUM', 1],
+    ['inter', 2, 5, 'INVITE', 'Mx'],
+    ['inter', 5, 6, 'INVITE — public IP, LRN route, topology hiding', 'Ici'],
+    ['term', 6, 7, 'INVITE', 'Mx'],
+    ['term', 7, 8, 'LIR / LIA — serving S-CSCF of UE-B', 'Cx', 1],
+    ['term', 7, 9, 'INVITE', 'Mw'],
+    ['term', 9, 10, 'INVITE — term iFC hit', 'ISC'],
+    ['term', 10, 8, 'UDR / UDA — TADS, user state', 'Sh', 1],
+    ['term', 10, 9, 'INVITE — term features applied', 'ISC'],
+    ['term', 9, 11, 'INVITE', 'Mw'],
+    ['term', 11, 12, 'INVITE', 'Gm'],
+    ['ans', 12, 11, '183 Session Progress + SDP', 'Gm'],
+    ['ans', 11, 11, 'AAR / AAA → PCRF', 'Rx'],
+    ['ans', 11, 6, '183 / 180 / 200 OK — via S-CSCF, TAS, I-CSCF (Zone B)', '', 1],
+    ['ans', 6, 5, '183 / 180 / 200 OK', 'Ici'],
+    ['ans', 5, 1, '183 / 180 / 200 OK — via S-CSCF, TAS (Zone A)', '', 1],
+    ['ans', 1, 1, 'AAR / AAA → PCRF', 'Rx'],
+    ['ans', 1, 0, '183 / 180 / 200 OK', 'Gm']
+  ]
+};
+
+class Component extends DCLogic {
+  state = { lane: null, row: null, sel: null };
+
+  build(def, si) {
+    const n = def.nodes.length;
+    const pitch = CANVAS / n;
+    const X = i => PAD + pitch * (i + 0.5);
+    const chipW = Math.min(pitch - 10, 150);
+    const { lane, row, sel } = this.state;
+    const laneOf = si === (lane && lane.s) ? lane.i : null;
+
+    const nodes = def.nodes.map(([name, sub, kind], i) => ({
+      name, sub, color: KIND[kind],
+      left: Math.round(X(i) - chipW / 2), width: Math.round(chipW),
+      bg: laneOf === i ? '#F5F5F3' : 'transparent',
+      op: laneOf === null || laneOf === i ? 1 : 0.42,
+      onEnter: () => this.setState({ lane: { s: si, i } })
+    }));
+
+    const lifelines = def.nodes.map((_, i) => ({
+      x: Math.round(X(i)),
+      color: laneOf === i ? 'rgba(29,29,31,0.22)' : 'rgba(29,29,31,0.07)'
+    }));
+
+    const groups = def.groups.map(([a, b, label, sub, color]) => ({
+      label, sub: sub || '', color,
+      left: Math.round(PAD + pitch * a),
+      right: Math.round(PAD + pitch * (b + 1)),
+      width: Math.round(pitch * (b - a + 1)),
+      mid: Math.round(PAD + pitch * ((a + b + 1) / 2))
+    }));
+    const seams = def.seams.map(([after, label]) => ({
+      label, x: Math.round(PAD + pitch * (after + 1))
+    }));
+
+    const phases = [];
+    ['orig', 'res', 'inter', 'term', 'ans'].forEach(key => {
+      const list = def.msgs.filter(m => m[0] === key);
+      if (!list.length) return;
+      const meta = PHASES[key];
+      const num = phases.length + 1;
+      phases.push({
+        key, accent: meta.accent,
+        label: num + ' · ' + meta.label,
+        media: key === 'ans' ? def.media : null,
+        mediaName: key === 'ans' ? def.mediaName : '',
+        mediaLeft: Math.round(X(0)), mediaWidth: Math.round(X(n - 1) - X(0)),
+        rows: list.map((raw, ri) => {
+          const [, from, to, text, iface, dash] = raw;
+          const id = si + ':' + key + ':' + ri;
+          const cut = text.indexOf(' — ');
+          const name = cut < 0 ? text : text.slice(0, cut);
+          const desc = cut < 0 ? '' : text.slice(cut + 3);
+          const touches = laneOf === null || laneOf === from || laneOf === to;
+          const active = row === id || sel === id;
+          const est = name.length * 7.4 + (desc ? desc.length * 6.6 + 12 : 0) +
+                      (iface ? iface.length * 6.6 + 12 : 0) + 20;
+          const detail = active
+            ? def.nodes[from][0] + ' → ' + def.nodes[to][0]
+            : null;
+          const base = {
+            name, desc, iface: iface || '', detail,
+            op: touches ? (row === null || row === id ? 1 : 0.42) : 0.22,
+            plate: active ? '#F7F7F5' : 'transparent',
+            onEnter: () => this.setState({ row: id }),
+            onClick: () => this.setState({ sel: sel === id ? null : id })
+          };
+          if (from === to) {
+            const rightSide = X(from) > PAD + CANVAS / 2;
+            const lw = Math.min(est, 340);
+            return Object.assign(base, {
+              isSelf: true, isFlow: false,
+              left: Math.round(X(from)), headX: Math.round(X(from) - 3),
+              labelWidth: Math.round(lw),
+              labelLeft: Math.round(rightSide ? X(from) - 14 - lw : X(from) + 52)
+            });
+          }
+          const d = to > from ? 1 : -1;
+          const start = X(from) + d * 5;
+          const end = X(to) - d * 8;
+          const left = Math.min(start, end);
+          const width = Math.abs(end - start);
+          const lw = Math.max(width, est);
+          let ll = left + width / 2 - lw / 2;
+          ll = Math.max(6, Math.min(ll, W - 6 - lw));
+          return Object.assign(base, {
+            isSelf: false, isFlow: true,
+            stroke: dash ? 'dashed' : 'solid',
+            right: d > 0, leftward: d < 0,
+            lineOp: active ? 0.95 : 0.5,
+            left: Math.round(left), width: Math.round(width),
+            headX: Math.round(d > 0 ? left + width : left - 7),
+            labelLeft: Math.round(ll), labelWidth: Math.round(lw)
+          });
+        })
+      });
+    });
+
+    return { ...def, nodes, lifelines, groups, seams, phases };
+  }
+
+  renderVals() {
+    return {
+      scenarios: [this.build(A, 0), this.build(B, 1)],
+      leaveLane: () => this.setState({ lane: null }),
+      leaveRow: () => this.setState({ row: null })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

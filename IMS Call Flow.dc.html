@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F6F8; }
+  a { color: #514BD1; text-decoration: none; }
+  a:hover { color: #12855F; }
+</style>
+</helmet>
+<div style="width:1680px;padding:44px 40px 56px;box-sizing:border-box;background:#F6F6F8;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#12161C;-webkit-font-smoothing:antialiased">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:48px;padding:0 4px 22px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:26px;height:3px;border-radius:2px;background:#0E9A96"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2.2px;color:#0E9A96">C-DOT IMS · SOLUTION DOC v17.0 · JUNE&#8217;26</span>
+      </div>
+      <h1 style="margin:0;font-size:40px;font-weight:600;letter-spacing:-1px;line-height:1.05">Intra-Zone vs Inter-Zone Call Flow</h1>
+      <p style="margin:0;max-width:820px;font-size:15px;line-height:1.5;color:#5B6676;text-wrap:pretty">Which nodes wake up, which interfaces carry each message, and exactly where the two flows diverge.</p>
+    </div>
+    <div style="display:flex;gap:8px;padding-bottom:6px">
+      <div style="width:44px;height:4px;border-radius:2px;background:#2F5FD8"></div>
+      <div style="width:44px;height:4px;border-radius:2px;background:#6E43C8"></div>
+      <div style="width:44px;height:4px;border-radius:2px;background:#C9601F"></div>
+      <div style="width:44px;height:4px;border-radius:2px;background:#12855F"></div>
+      <div style="width:44px;height:4px;border-radius:2px;background:#C42A6B"></div>
+    </div>
+  </div>
+
+  <sc-for list="{{ scenarios }}" as="s" hint-placeholder-count="2">
+    <div style="width:1600px;margin:0 0 28px;background:#FFFFFF;border:1px solid #E7E9EE;border-radius:22px;box-shadow:0 1px 2px rgba(11,18,32,0.03),0 12px 32px -18px rgba(11,18,32,0.14);overflow:hidden">
+      <div style="display:flex;align-items:baseline;gap:16px;padding:30px 40px 6px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.8px;color:#98A2B3">{{ s.kick }}</span>
+        <span style="width:1px;height:14px;background:#E7E9EE"></span>
+        <span style="font-size:21px;font-weight:600;letter-spacing:-0.35px">{{ s.title }}</span>
+      </div>
+
+      <div style="position:relative;height:44px;margin:14px 0 0">
+        <sc-for list="{{ s.groups }}" as="g" hint-placeholder-count="1">
+          <div style="position:absolute;top:0;left:{{ g.left }}px;width:{{ g.width }}px;height:26px;--gc:{{ g.color }}">
+            <div style="position:absolute;top:8px;left:0;right:0;height:8px;border:1.3px solid var(--gc);border-bottom:none;border-radius:5px 5px 0 0;opacity:0.5"></div>
+            <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);padding:4px 14px;border-radius:11px;background:var(--gc);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.1px;color:#FFFFFF;white-space:nowrap">{{ g.label }}</div>
+          </div>
+        </sc-for>
+        <sc-for list="{{ s.seams }}" as="k" hint-placeholder-count="0">
+          <div style="position:absolute;top:4px;left:{{ k.x }}px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px">
+            <div style="width:9px;height:9px;background:#C9601F;transform:rotate(45deg)"></div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:0.5px;color:#C9601F;white-space:nowrap">{{ k.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="position:relative;height:60px;margin:0 0 4px">
+        <sc-for list="{{ s.nodes }}" as="n" hint-placeholder-count="11">
+          <div style="position:absolute;top:0;left:{{ n.left }}px;width:{{ n.width }}px;box-sizing:border-box;padding:9px 10px 10px;background:#FFFFFF;border:1px solid #E5E8EE;border-radius:11px;box-shadow:0 1px 2px rgba(11,18,32,0.04);text-align:center;--nc:{{ n.color }}">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;border-radius:11px 11px 0 0;background:var(--nc)"></div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--nc)"></span>
+              <span style="font-size:13.5px;font-weight:600;letter-spacing:-0.1px;white-space:nowrap">{{ n.name }}</span>
+            </div>
+            <div style="margin-top:3px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#7B8494;white-space:nowrap">{{ n.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-for list="{{ s.phases }}" as="p" hint-placeholder-count="4">
+        <div style="position:relative;width:1568px;margin:0 16px;padding:16px 0 12px;box-sizing:border-box;background:{{ p.bg }};border-radius:13px;--acc:{{ p.accent }}">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;border-radius:2px;background:var(--acc)"></div>
+          <div style="position:absolute;top:12px;right:22px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;color:var(--acc)">{{ p.label }}</div>
+          <sc-for list="{{ p.lifelines }}" as="l" hint-placeholder-count="11">
+            <div style="position:absolute;top:0;left:{{ l.x }}px;width:0;height:100%;border-left:1px dashed rgba(18,22,28,0.16)"></div>
+          </sc-for>
+          <sc-for list="{{ p.rows }}" as="m" hint-placeholder-count="4">
+            <div style="position:relative;height:44px">
+              <div style="position:absolute;top:3px;left:{{ m.labelLeft }}px;width:{{ m.labelWidth }}px;display:flex;align-items:baseline;justify-content:center;gap:9px">
+                <span style="font-size:12.5px;line-height:1.2;color:#1F2733;white-space:nowrap">{{ m.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.5px;color:var(--acc);white-space:nowrap">{{ m.iface }}</span>
+              </div>
+              <sc-if value="{{ m.isSelf }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:26px;left:{{ m.left }}px;width:44px;height:13px;border:1.6px solid var(--acc);border-left:none;border-radius:0 7px 7px 0"></div>
+                <div style="position:absolute;top:34px;left:{{ m.headX }}px;width:0;height:0;border-right:8px solid var(--acc);border-top:5px solid transparent;border-bottom:5px solid transparent"></div>
+              </sc-if>
+              <sc-if value="{{ m.isFlow }}" hint-placeholder-val="{{ true }}">
+                <div style="position:absolute;top:34px;left:{{ m.left }}px;width:{{ m.width }}px;height:0;border-top:1.7px {{ m.stroke }} var(--acc)"></div>
+                <sc-if value="{{ m.right }}" hint-placeholder-val="{{ true }}">
+                  <div style="position:absolute;top:29px;left:{{ m.headX }}px;width:0;height:0;border-left:8px solid var(--acc);border-top:5px solid transparent;border-bottom:5px solid transparent"></div>
+                </sc-if>
+                <sc-if value="{{ m.left_ }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;top:29px;left:{{ m.headX }}px;width:0;height:0;border-right:8px solid var(--acc);border-top:5px solid transparent;border-bottom:5px solid transparent"></div>
+                </sc-if>
+              </sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ p.media }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;height:46px">
+              <div style="position:absolute;top:32px;left:{{ p.mediaLeft }}px;width:{{ p.mediaWidth }}px;height:4px;border-radius:2px;background:var(--acc);opacity:0.26"></div>
+              <div style="position:absolute;top:21px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:9px;padding:5px 18px;background:#FFFFFF;border:1.3px solid var(--acc);border-radius:14px;box-shadow:0 1px 2px rgba(11,18,32,0.05)">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--acc)"></span>
+                <span style="font-size:12px;font-weight:600;color:var(--acc);white-space:nowrap">{{ p.media }}</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+
+      <div style="display:flex;gap:14px;align-items:flex-start;width:1568px;margin:16px 16px 26px;padding:14px 20px;box-sizing:border-box;background:#F8FAFC;border:1px solid #EAEEF4;border-radius:11px">
+        <div style="width:3px;align-self:stretch;border-radius:2px;background:#9AA6B6;flex:none"></div>
+        <p style="margin:0;font-size:12.5px;line-height:1.55;color:#475569;text-wrap:pretty">{{ s.note }}</p>
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="width:1600px;background:#FFFFFF;border:1px solid #E7E9EE;border-radius:20px;box-shadow:0 1px 2px rgba(11,18,32,0.03);padding:26px 40px 30px;box-sizing:border-box">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.8px;color:#98A2B3">LEGEND · NODE PLACEMENT</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 60px;margin-top:18px">
+      <div style="display:flex;align-items:center;gap:11px">
+        <span style="width:13px;height:13px;border-radius:4px;background:#6B7280;flex:none"></span>
+        <span style="font-size:12.5px;color:#475569">UE / subscriber</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px">
+        <span style="width:13px;height:13px;border-radius:4px;background:#0E9A96;flex:none"></span>
+        <span style="font-size:12.5px;color:#475569">Mini DC · circle-wise  (P-CSCF, IBCF, MRF, IMS-DP, Conf-Media)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px">
+        <span style="width:13px;height:13px;border-radius:4px;background:#514BD1;flex:none"></span>
+        <span style="font-size:12.5px;color:#475569">Main DC · zonal  (I/S-CSCF, TAS, IMSENUM, Conf-Sig, USSD-AS)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px">
+        <span style="width:13px;height:13px;border-radius:4px;background:#C9880C;flex:none"></span>
+        <span style="font-size:12.5px;color:#475569">Subscriber data · HSS / SLF via DRA + DLB</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showLifelines&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;tintBands&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const KIND = { ue: '#6B7280', mini: '#0E9A96', main: '#514BD1', data: '#C9880C' };
+const PHASES = {
+  orig:  { label: '1 · ORIGINATION',      accent: '#2F5FD8', bg: '#F2F5FC' },
+  res:   { label: '2 · NUMBER RESOLUTION', accent: '#6E43C8', bg: '#F6F3FC' },
+  inter: { label: '3 · INTERCONNECT',      accent: '#C9601F', bg: '#FDF4EE' },
+  term:  { label: 'TERMINATION',           accent: '#12855F', bg: '#EEF9F3' },
+  ans:   { label: 'ANSWER & MEDIA',        accent: '#C42A6B', bg: '#FDF2F6' }
+};
+
+const CANVAS = 1520, X0 = 24, ROWH = 44;
+
+const A = {
+  kick: 'SCENARIO A',
+  title: 'Intra-Zone call — both subscribers on the same Main DC',
+  note: 'No IBCF, no public IP, no GMSC. Only the Mini DC (P-CSCF / IMS-DP) differs per circle; I-CSCF, S-CSCF, TAS, IMSENUM are zonal and shared. Intra-circle roaming stays home-routed.',
+  media: 'RTP · IMS-DP (Mini DC A) ↔ IMS-DP (Mini DC B)',
+  nodes: [
+    ['UE-A', 'subscriber', 'ue'], ['P-CSCF', 'Mini DC · Ckt A', 'mini'],
+    ['S-CSCF', 'Main DC · orig', 'main'], ['TAS', 'Main DC · orig', 'main'],
+    ['IMSENUM', 'Main DC', 'main'], ['I-CSCF', 'Main DC', 'main'],
+    ['HSS / SLF', 'via DRA+DLB', 'data'], ['S-CSCF', 'Main DC · term', 'main'],
+    ['TAS', 'Main DC · term', 'main'], ['P-CSCF', 'Mini DC · Ckt B', 'mini'],
+    ['UE-B', 'subscriber', 'ue']
+  ],
+  groups: [[2, 8, 'SAME ZONE · shared Main DC (zonal core)', '#514BD1']],
+  seams: [],
+  msgs: [
+    ['orig', 0, 1, 'INVITE', 'Gm'],
+    ['orig', 1, 2, 'INVITE', 'Mw'],
+    ['orig', 2, 3, 'INVITE — orig iFC hit', 'ISC'],
+    ['orig', 3, 6, 'UDR — originating subscriber data', 'Sh', 1],
+    ['orig', 6, 3, 'UDA', 'Sh', 1],
+    ['orig', 3, 2, 'INVITE — orig features applied', 'ISC'],
+    ['res', 2, 4, 'NAPTR query — dialled MSISDN', 'ENUM', 1],
+    ['res', 4, 2, 'SIP-URI — same zone, no LRN', 'ENUM', 1],
+    ['term', 2, 5, 'INVITE', 'Mw'],
+    ['term', 5, 6, 'LIR — locate serving S-CSCF', 'Cx', 1],
+    ['term', 6, 5, 'LIA — S-CSCF name', 'Cx', 1],
+    ['term', 5, 7, 'INVITE', 'Mw'],
+    ['term', 7, 8, 'INVITE — term iFC hit', 'ISC'],
+    ['term', 8, 6, 'UDR / UDA — TADS, user state, CSRN', 'Sh', 1],
+    ['term', 8, 7, 'INVITE — term features applied', 'ISC'],
+    ['term', 7, 9, 'INVITE', 'Mw'],
+    ['term', 9, 10, 'INVITE', 'Gm'],
+    ['ans', 10, 9, '183 Session Progress + SDP', 'Gm'],
+    ['ans', 9, 9, 'AAR / AAA → PCRF (bearer)', 'Rx'],
+    ['ans', 9, 1, '183 / 180 Ringing / 200 OK — same chain reversed', '', 1],
+    ['ans', 1, 1, 'AAR / AAA → PCRF (bearer)', 'Rx'],
+    ['ans', 1, 0, '183 / 180 Ringing / 200 OK', 'Gm'],
+    ['ans', 0, 10, 'PRACK · UPDATE · ACK — full signalling path', '', 1]
+  ]
+};
+
+const B = {
+  kick: 'SCENARIO B',
+  title: 'Inter-Zone call — two independent C-DOT IMS zones, joined at the IBCF',
+  note: 'IBCF is the only door between zones: Ici on public IP, topology hiding, IPv4/IPv6 interworking, and its own ACR to CDF. A TEL-URI, or an LRN that is not a 4G C-DOT subscriber, leaves via GMSC instead.',
+  media: 'RTP · IMS-DP (Zone A) ↔ IBCF / I-SBC ↔ IBCF / I-SBC ↔ IMS-DP (Zone B)',
+  nodes: [
+    ['UE-A', 'Zone A', 'ue'], ['P-CSCF', 'Mini DC · Zone A', 'mini'],
+    ['S-CSCF', 'Main DC · Zone A', 'main'], ['TAS', 'Main DC · Zone A', 'main'],
+    ['IMSENUM', 'all-zone data', 'main'], ['IBCF', 'Mini DC · Zone A', 'mini'],
+    ['IBCF', 'Mini DC · Zone B', 'mini'], ['I-CSCF', 'Main DC · Zone B', 'main'],
+    ['HSS', 'Zone B · via DLB', 'data'], ['S-CSCF', 'Main DC · Zone B', 'main'],
+    ['TAS', 'Main DC · Zone B', 'main'], ['P-CSCF', 'Mini DC · Zone B', 'mini'],
+    ['UE-B', 'Zone B', 'ue']
+  ],
+  groups: [[1, 5, 'ZONE A', '#514BD1'], [6, 12, 'ZONE B', '#0E9A96']],
+  seams: [[5, 'interconnect · Ici']],
+  msgs: [
+    ['orig', 0, 1, 'INVITE', 'Gm'],
+    ['orig', 1, 2, 'INVITE', 'Mw'],
+    ['orig', 2, 3, 'INVITE — orig iFC hit', 'ISC'],
+    ['orig', 3, 2, 'INVITE — orig features, prepaid / VPN checked', 'ISC'],
+    ['res', 2, 4, 'NAPTR query', 'ENUM', 1],
+    ['res', 4, 2, 'SIP-URI of other zone · TEL-URI + LRN → GMSC', 'ENUM', 1],
+    ['inter', 2, 5, 'INVITE', 'Mx'],
+    ['inter', 5, 6, 'INVITE — public IP, LRN route, topology hiding', 'Ici'],
+    ['term', 6, 7, 'INVITE', 'Mx'],
+    ['term', 7, 8, 'LIR / LIA — serving S-CSCF of UE-B', 'Cx', 1],
+    ['term', 7, 9, 'INVITE', 'Mw'],
+    ['term', 9, 10, 'INVITE — term iFC hit', 'ISC'],
+    ['term', 10, 8, 'UDR / UDA — TADS, user state', 'Sh', 1],
+    ['term', 10, 9, 'INVITE — term features applied', 'ISC'],
+    ['term', 9, 11, 'INVITE', 'Mw'],
+    ['term', 11, 12, 'INVITE', 'Gm'],
+    ['ans', 12, 11, '183 Session Progress + SDP', 'Gm'],
+    ['ans', 11, 11, 'AAR / AAA → PCRF', 'Rx'],
+    ['ans', 11, 6, '183 / 180 / 200 OK — via S-CSCF, TAS, I-CSCF (Zone B)', '', 1],
+    ['ans', 6, 5, '183 / 180 / 200 OK', 'Ici'],
+    ['ans', 5, 1, '183 / 180 / 200 OK — via S-CSCF, TAS (Zone A)', '', 1],
+    ['ans', 1, 1, 'AAR / AAA → PCRF', 'Rx'],
+    ['ans', 1, 0, '183 / 180 / 200 OK', 'Gm']
+  ]
+};
+
+class Component extends DCLogic {
+  build(def) {
+    const n = def.nodes.length;
+    const pitch = CANVAS / n;
+    const X = i => X0 + pitch * (i + 0.5);
+    const chipW = Math.min(pitch - 14, 138);
+    const showLines = this.props.showLifelines !== false;
+    const tint = this.props.tintBands !== false;
+
+    const nodes = def.nodes.map(([name, sub, kind], i) => ({
+      name, sub, color: KIND[kind],
+      left: Math.round(X(i) + 16 - chipW / 2),
+      width: Math.round(chipW)
+    }));
+
+    const groups = def.groups.map(([a, b, label, color]) => ({
+      label, color,
+      left: Math.round(X0 + pitch * a),
+      width: Math.round(pitch * (b - a + 1))
+    }));
+    const seams = def.seams.map(([after, label]) => ({
+      label, x: Math.round(X0 + pitch * (after + 1))
+    }));
+
+    const lifelines = showLines
+      ? def.nodes.map((_, i) => ({ x: Math.round(X(i)) }))
+      : [];
+
+    const order = ['orig', 'res', 'inter', 'term', 'ans'];
+    const phases = [];
+    order.forEach(key => {
+      const rows = def.msgs.filter(m => m[0] === key);
+      if (!rows.length) return;
+      const meta = PHASES[key];
+      const idx = phases.length + 1;
+      phases.push({
+        key,
+        label: (key === 'term' || key === 'ans') ? idx + ' · ' + meta.label : meta.label,
+        bg: tint ? meta.bg : '#FBFBFC',
+        accent: meta.accent,
+        lifelines,
+        media: key === 'ans' ? def.media : null,
+        mediaLeft: Math.round(X(0)),
+        mediaWidth: Math.round(X(n - 1) - X(0)),
+        rows: rows.map(([, from, to, label, iface, dash]) => {
+          if (from === to) {
+            return {
+              label, iface: iface || '', isSelf: true, isFlow: false,
+              left: Math.round(X(from)), headX: Math.round(X(from) - 4),
+              labelWidth: 240,
+              labelLeft: Math.round(X(from) > X0 + CANVAS / 2 ? X(from) - 250 : X(from) + 56)
+            };
+          }
+          const d = to > from ? 1 : -1;
+          const start = X(from) + d * 6;
+          const end = X(to) - d * 9;
+          const left = Math.min(start, end);
+          const width = Math.abs(end - start);
+          return {
+            label, iface: iface || '', isSelf: false, isFlow: true,
+            stroke: dash ? 'dashed' : 'solid',
+            right: d > 0, left_: d < 0,
+            left: Math.round(left), width: Math.round(width),
+            headX: Math.round(d > 0 ? left + width : left - 8),
+            labelLeft: Math.round(left), labelWidth: Math.round(width)
+          };
+        })
+      });
+    });
+
+    return { ...def, nodes, groups, seams, phases };
+  }
+
+  renderVals() {
+    return { scenarios: [this.build(A), this.build(B)] };
+  }
+}
+
+</script>
+</body>
+</html>
