@@ -23,7 +23,7 @@
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="width:26px;height:3px;border-radius:2px;background:#0E9A96"></div>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2.2px;color:#0E9A96">C-DOT IMS · SOLUTION DOC v17.0 · JUNE&#8217;26</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2.2px;color:#0E9A96">IMS · SOLUTION DOC v17.0 · JUNE&#8217;26</span>
       </div>
       <h1 style="margin:0;font-size:40px;font-weight:600;letter-spacing:-1px;line-height:1.05">Intra-Zone vs Inter-Zone Call Flow</h1>
       <p style="margin:0;max-width:820px;font-size:15px;line-height:1.5;color:#5B6676;text-wrap:pretty">Which nodes wake up, which interfaces carry each message, and exactly where the two flows diverge.</p>
@@ -200,8 +200,8 @@ const A = {
 
 const B = {
   kick: 'SCENARIO B',
-  title: 'Inter-Zone call — two independent C-DOT IMS zones, joined at the IBCF',
-  note: 'IBCF is the only door between zones: Ici on public IP, topology hiding, IPv4/IPv6 interworking, and its own ACR to CDF. A TEL-URI, or an LRN that is not a 4G C-DOT subscriber, leaves via GMSC instead.',
+  title: 'Inter-Zone call — two independent IMS zones, joined at the IBCF',
+  note: 'IBCF is the only door between zones: Ici on public IP, topology hiding, IPv4/IPv6 interworking, and its own ACR to CDF. A TEL-URI, or an LRN that is not a 4G subscriber, leaves via GMSC instead.',
   media: 'RTP · IMS-DP (Zone A) ↔ IBCF / I-SBC ↔ IBCF / I-SBC ↔ IMS-DP (Zone B)',
   nodes: [
     ['UE-A', 'Zone A', 'ue'], ['P-CSCF', 'Mini DC · Zone A', 'mini'],

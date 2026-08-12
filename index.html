@@ -18,7 +18,7 @@
 <div style="width:100%;box-sizing:border-box;padding:72px 40px 96px;background:#FAF9F8;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text',system-ui,sans-serif;color:#1D1D1F;-webkit-font-smoothing:antialiased">
 
   <div style="width:1648px;margin:0 auto 56px;box-sizing:border-box;padding:0 44px">
-    <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;font-weight:500;letter-spacing:1.6px;color:#8E8E93">C-DOT IMS · SOLUTION DOC v17.0 · JUNE&#8217;26</div>
+    <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;font-weight:500;letter-spacing:1.6px;color:#8E8E93">IMS · SOLUTION DOC v17.0 · JUNE&#8217;26</div>
     <h1 style="margin:20px 0 0;font-size:46px;font-weight:600;letter-spacing:-1.4px;line-height:1.06;max-width:900px;text-wrap:balance">Intra-Zone vs Inter-Zone Call Flow</h1>
     <p style="margin:18px 0 0;max-width:620px;font-size:16px;line-height:1.55;color:#6E6E73;text-wrap:pretty">Which nodes wake up, which interfaces carry each message, and exactly where the two flows diverge.</p>
   </div>
@@ -207,8 +207,8 @@ const A = {
 
 const B = {
   kick: 'SCENARIO B',
-  title: 'Inter-Zone call — two independent C-DOT IMS zones, joined at the IBCF',
-  note: 'IBCF is the only door between zones: Ici on public IP, topology hiding, IPv4/IPv6 interworking, and its own ACR to CDF. A TEL-URI, or an LRN that is not a 4G C-DOT subscriber, leaves via GMSC instead.',
+  title: 'Inter-Zone call — two independent IMS zones, joined at the IBCF',
+  note: 'IBCF is the only door between zones: Ici on public IP, topology hiding, IPv4/IPv6 interworking, and its own ACR to CDF. A TEL-URI, or an LRN that is not a 4G subscriber, leaves via GMSC instead.',
   mediaName: 'RTP',
   media: 'IMS-DP (Zone A) ↔ IBCF / I-SBC ↔ IBCF / I-SBC ↔ IMS-DP (Zone B)',
   nodes: [

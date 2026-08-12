@@ -1,6 +1,6 @@
 # Intra-Zone vs Inter-Zone Call Flow
 
-C-DOT IMS solution doc (v17.0) that diagrams SIP call signaling for two scenarios on the IMS core — an **intra-zone** call, where both subscribers sit under the same Main DC, and an **inter-zone** call, where the call crosses zones through IBCF/GMSC interconnect. It shows which nodes (P-CSCF, I/S-CSCF, TAS, IMSENUM, HSS/SLF, IBCF, MRF, IMS-DP, etc.) are involved at each phase — origination, number resolution, interconnect, termination, and answer/media — which interfaces (Gm, Mw, ISC, Cx, Sh, ENUM, Rx, IBCF trunk) carry each message, and exactly where the two flows diverge.
+IMS solution doc (v17.0) that diagrams SIP call signaling for two scenarios on the IMS core — an **intra-zone** call, where both subscribers sit under the same Main DC, and an **inter-zone** call, where the call crosses zones through IBCF/GMSC interconnect. It shows which nodes (P-CSCF, I/S-CSCF, TAS, IMSENUM, HSS/SLF, IBCF, MRF, IMS-DP, etc.) are involved at each phase — origination, number resolution, interconnect, termination, and answer/media — which interfaces (Gm, Mw, ISC, Cx, Sh, ENUM, Rx, IBCF trunk) carry each message, and exactly where the two flows diverge.
 
 ## Contents
 
